@@ -8,16 +8,16 @@ You may see it within the code written in this repo, that some of it relies on g
 ## Physics Algorithm
 The physics algorithm used in this system was very important to create the smooth projectile drop motion. How it works:
  ```
-		local distance = (bullet.oldposition.p - bullet.position.p).magnitude
-    -->>: Distance based on the old position and the new position. This is used later in the raycasting in order to find objects between the 2 points.
-		bul.CFrame = CFrame.new(bullet.oldposition.p, bullet.position.p) * CFrame.new(0,0, -distance*0.5) -->>: Updates bullet CFrame based on previous position
-    -->>: Sets projectile CFrame to look at its new position to update its orientation. 
-    -->>: The distance is halved so the projectile can be placed between the 2 points (The old & new positions).
-    -->>: Projectile ends up being between the 2 points, to help us visualize the projectile in the game world.
-		local newray = Ray.new(bullet.oldposition.p, (bullet.position.p - bullet.oldposition.p).unit * distance)
-    -->>: Creates a ray pointing from the previous position to the new position with the distance defined.
-		local hit = workspace:FindPartOnRayWithIgnoreList(newray, {--Tables/Parts you want to ignore})
-    -->>: Create an ignore list to error check the raycast collisions. Normally you want to keep the players character and camera in here.
+local distance = (bullet.oldposition.p - bullet.position.p).magnitude
+-->>: Distance based on the old position and the new position. This is used later in the raycasting in order to find objects between the 2 points.
+bul.CFrame = CFrame.new(bullet.oldposition.p, bullet.position.p) * CFrame.new(0,0, -distance*0.5) -->>: Updates bullet CFrame based on previous position
+-->>: Sets projectile CFrame to look at its new position to update its orientation. 
+-->>: The distance is halved so the projectile can be placed between the 2 points (The old & new positions).
+-->>: Projectile ends up being between the 2 points, to help us visualize the projectile in the game world.
+local newray = Ray.new(bullet.oldposition.p, (bullet.position.p - bullet.oldposition.p).unit * distance)
+-->>: Creates a ray pointing from the previous position to the new position with the distance defined.
+local hit = workspace:FindPartOnRayWithIgnoreList(newray, {--Tables/Parts you want to ignore})
+-->>: Create an ignore list to error check the raycast collisions. Normally you want to keep the players character and camera in here.
 ```
 
 I learnt the algorithm off a pretty imformant DevForum post and translated it into Luau. If you're interested in the post, links wil be shown below!

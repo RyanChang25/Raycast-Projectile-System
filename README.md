@@ -20,7 +20,7 @@ local hit = workspace:FindPartOnRayWithIgnoreList(newray, {--Tables/Parts you wa
 -->>: Create an ignore list to error check the raycast collisions. Normally you want to keep the players character and camera in here.
 ```
 ## Basic Usage
-This is an example of how it was used in one of my games, Magic Zombie Mayhem:
+This is an example of how it was used in one of my zombie shooter games, Magic Zombie Mayhem:
 ```
 Knit.GetService("ProjectileService"):BulletRender(Character.HumanoidRootPart, Character["Nozzle"], Character.Primary.Gun.Value, "Attachment")
 -->>: (HumanoidRootPart, Bullet Origin, Type of Gun, Attachment for Particle FX)

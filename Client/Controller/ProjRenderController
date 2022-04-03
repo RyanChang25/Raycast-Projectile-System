@@ -1,3 +1,6 @@
+-->>: System is used in conjunction with Knit
+-- (Knit is not required for this to work)
+
 local CollectionService = game:GetService("CollectionService")
 local Debris = game:GetService("Debris")
 local Knit = require(game:GetService("ReplicatedStorage").Packages.Knit)

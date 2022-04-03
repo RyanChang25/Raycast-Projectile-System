@@ -6,7 +6,7 @@ This is a system which uses OOP, raycasting, and a physics algorithm that I lear
 You may see it within the code written in this repo, that some of it relies on getting game object data from the *GameDictionary*. This is because I like to keep all of my game object data within one dictionary so it can be easily accessed and read. Take a look at the *GameDictionary* yourself if you're interested how I handle game object data!
 
 ## Physics Algorithm
-The physics algorithm used in this system was very important to create the smooth projectile drop motion. How it works:
+The physics algorithm used in this system was very important to create the smooth projectile drop motion. I learnt the algorithm off a pretty imformant DevForum post and translated it into Luau. How it works: (If you're interested in the DevForum post, links wil be shown below!)
  ```
 local distance = (bullet.oldposition.p - bullet.position.p).magnitude
 -->>: Distance based on the old position and the new position. This is used later in the raycasting in order to find objects between the 2 points.
@@ -20,4 +20,4 @@ local hit = workspace:FindPartOnRayWithIgnoreList(newray, {--Tables/Parts you wa
 -->>: Create an ignore list to error check the raycast collisions. Normally you want to keep the players character and camera in here.
 ```
 
-I learnt the algorithm off a pretty imformant DevForum post and translated it into Luau. If you're interested in the post, links wil be shown below!
+

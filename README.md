@@ -20,4 +20,8 @@ local hit = workspace:FindPartOnRayWithIgnoreList(newray, {--Tables/Parts you wa
 -->>: Create an ignore list to error check the raycast collisions. Normally you want to keep the players character and camera in here.
 ```
 
+## Important Links
 
+**DevForum Post - https://devforum.roblox.com/t/best-methods-to-handle-arrow-projectiles/239463/20**
+
+**Game using this System - https://www.roblox.com/games/9058545095/Magic-Zombie-Mayhem**

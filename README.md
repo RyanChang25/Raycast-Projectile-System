@@ -1,2 +1,2 @@
 # Raycast Projectile System
-Bullet Service is a service I created to handle smooth bullet physics in my games!
+I the Raycast Projectile System to render smooth projectile physics in my games!

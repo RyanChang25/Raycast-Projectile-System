@@ -7,11 +7,14 @@ local CollectionService = game:GetService("CollectionService")
 -- Create the service:
 local ProjectileService = Knit.CreateService {
 	Name = "ProjectileService";
-	Client = {RenderSignal = Knit.CreateSignal(), BloodSignal = Knit.CreateSignal()}; -->>: Create signals for controllers
+	Client = {RenderSignal = Knit.CreateSignal(), BloodSignal = Knit.CreateSignal()};
 }
 
 function ProjectileService.Client:BulletRender(plr, HRP, torso, gunType, attachment)
-	Knit.GetService('ProjectileService').Client.RenderSignal:FireAll(plr, HRP, torso, gunType) -->>: Fire projectile render to all clients
+	plr.Character.Primary.Handle[attachment].FlashFX:Emit(15)
+	plr.Character.Primary.Handle[attachment].OverHeat:Emit(75)
+	plr.Character.Primary.Handle.Gun:Play()
+	Knit.GetService('ProjectileService').Client.RenderSignal:FireAll(plr, HRP, torso, gunType) -- Bullet
 end
 
 function ProjectileService.Client:DamageReplication(plr, hit, damage)

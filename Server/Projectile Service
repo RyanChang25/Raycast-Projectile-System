@@ -1,0 +1,29 @@
+-->>: System is used in conjunction with Knit
+-- (Knit is not required for this to work)
+
+local Knit = require(game:GetService("ReplicatedStorage").Packages.Knit)
+local CollectionService = game:GetService("CollectionService")
+
+-- Create the service:
+local ProjectileService = Knit.CreateService {
+	Name = "ProjectileService";
+	Client = {RenderSignal = Knit.CreateSignal(), BloodSignal = Knit.CreateSignal()}; -->>: Create signals for controllers
+}
+
+function ProjectileService.Client:BulletRender(plr, HRP, torso, gunType, attachment)
+	Knit.GetService('ProjectileService').Client.RenderSignal:FireAll(plr, HRP, torso, gunType) -->>: Fire projectile render to all clients
+end
+
+function ProjectileService.Client:DamageReplication(plr, hit, damage)
+	if hit ~= nil and hit.Parent ~= nil and hit.Parent:FindFirstChild("Humanoid") and CollectionService:HasTag(hit.Parent, "Zombie") then
+		hit.Parent:FindFirstChild("Humanoid"):TakeDamage(damage)
+	end
+end
+
+function ProjectileService:KnitInit()
+end
+
+function ProjectileService:KnitStart()	
+end
+
+return ProjectileService

@@ -1,0 +1,62 @@
+-->>: System is used in conjunction with Knit
+-- (Knit is not required for this to work)
+local replicatedStorage = game:GetService("ReplicatedStorage")
+local userInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local GameDictionary = require(game.ReplicatedStorage.Shared.GameDictionary)
+--------------------------------------------------------------------
+local Knit = require(game:GetService("ReplicatedStorage").Packages.Knit)
+--------------------------------------------------------------------
+local Mouse = game.Players.LocalPlayer:GetMouse()
+local camera = workspace.CurrentCamera
+local projs = {}
+--------------------------------------------------------------------
+local ProjectileObject = {}
+ProjectileObject.__index = ProjectileObject
+
+function ProjectileObject.new(plr, HRP, nozzle, gunType) -->>: Creates a new projectile object
+	local handleCFrame = nozzle.Position + Vector3.new(0,GameDictionary.Primary[gunType].Elevation,0) + nozzle.CFrame.lookVector * 5
+	local plrTorso = nozzle.CFrame.p + Vector3.new(0,GameDictionary.Primary[gunType].Elevation,0) + nozzle.CFrame.lookVector * GameDictionary.Primary[gunType].Range
+	local origin = CFrame.new(plrTorso, handleCFrame) --this can be anything, for example the muzzle in a gun
+	local bulletComp = {}
+	bulletComp.velocity = GameDictionary.Primary[gunType].Velocity
+	bulletComp.drop = GameDictionary.Primary[gunType].Drop
+	bulletComp.laps = 0
+	bulletComp.oldposition = origin
+	bulletComp.position = origin
+	bulletComp.despawn = tick() + 1 -->>: How long the bullet will last, before it is removed
+	bulletComp.character = plr.Character
+	bulletComp.damage = GameDictionary.Primary[gunType].Damage
+	bulletComp.hit = false
+	bulletComp.bullet = Instance.new("Part", workspace)
+	
+	table.insert(projs, bulletComp)
+	
+	return setmetatable(bulletComp, ProjectileObject)
+end
+
+function ProjectileObject:SetProperties() -->>: Set projectile properties
+	
+	self.bullet.Size = Vector3.new(0.35, 0.2, 0.15)
+	self.bullet.CanCollide = false
+	self.bullet.Name = "Bullet"
+	self.bullet.Transparency = 1
+	self.bullet.BrickColor = BrickColor.new("Really black")
+	
+	local Trail = game.ReplicatedStorage.GameAssets.Bullet.Bullet.Trail:Clone()
+	local A0 = game.ReplicatedStorage.GameAssets.Bullet.Bullet.A0:Clone()
+	local A1 = game.ReplicatedStorage.GameAssets.Bullet.Bullet.A1:Clone()
+	Trail.Parent = self.bullet
+	Trail.Enabled = true
+	A0.Parent = self.bullet
+	A1.Parent = self.bullet
+	Trail.Attachment0 = A0
+	Trail.Attachment1 = A1
+	
+end
+
+function ProjectileObject.getProjTable()
+	return projs
+end
+
+return ProjectileObject

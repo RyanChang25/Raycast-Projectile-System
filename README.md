@@ -10,10 +10,10 @@ The physics algorithm used in this system was very important to create the smoot
  ```
 local distance = (bullet.oldposition.p - bullet.position.p).magnitude
 -->>: Distance based on the old position and the new position. This is used later in the raycasting in order to find objects between the 2 points.
-bul.CFrame = CFrame.new(bullet.oldposition.p, bullet.position.p) * CFrame.new(0,0, -distance*0.5) -->>: Updates bullet CFrame based on previous position
+bul.CFrame = CFrame.new(bullet.oldposition.p, bullet.position.p) * CFrame.new(0,0, -distance*0.5)
 -->>: Sets projectile CFrame to look at its new position to update its orientation. 
 -->>: The distance is halved so the projectile can be placed between the 2 points (The old & new positions).
--->>: Projectile ends up being between the 2 points, to help us visualize the projectile in the game world.
+-->>: Projectile ends up being between the 2 points, to help us visualize how the ray casting in the game world.
 local newray = Ray.new(bullet.oldposition.p, (bullet.position.p - bullet.oldposition.p).unit * distance)
 -->>: Creates a ray pointing from the previous position to the new position with the distance defined.
 local hit = workspace:FindPartOnRayWithIgnoreList(newray, {--Tables/Parts you want to ignore})

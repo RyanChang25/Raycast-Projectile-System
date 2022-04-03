@@ -24,4 +24,4 @@ local hit = workspace:FindPartOnRayWithIgnoreList(newray, {--Tables/Parts you wa
 
 **DevForum Post - https://devforum.roblox.com/t/best-methods-to-handle-arrow-projectiles/239463/20**
 
-**Game using this System - https://www.roblox.com/games/9058545095/Magic-Zombie-Mayhem**
+**Game Demo (Using this system) - https://www.roblox.com/games/9058545095/Magic-Zombie-Mayhem**

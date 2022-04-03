@@ -1,0 +1,150 @@
+local CollectionService = game:GetService("CollectionService")
+local Debris = game:GetService("Debris")
+local Knit = require(game:GetService("ReplicatedStorage").Packages.Knit)
+local ProjectileObject = require(script.Parent.Parent.Parent.Components.ProjectileObject)
+local plr = game.Players.LocalPlayer
+local camera = workspace.CurrentCamera
+local destroy = {}
+local bulletHolePart
+local zombieHolePart
+local Character = plr.Character or plr.CharacterAdded:Wait()
+
+-- Create the service:
+local ProjectileRenderController = Knit.CreateController {
+	Name = "ProjectileRenderController";
+	Client = {};
+}
+
+local function createBulletRef(bulletRef, id, name, size)
+	bulletRef = Instance.new("Part")
+	bulletRef.FormFactor = "Custom"
+	bulletRef.Size = size
+	bulletRef.Anchored = false
+	bulletRef.CanCollide = false
+	bulletRef.Transparency = 1
+	bulletRef.Name = name
+	local bulletholedecal = Instance.new("Decal", bulletRef)
+	bulletholedecal.Face = "Front"
+	bulletholedecal.Texture = "http://www.roblox.com/asset/?id="..id
+
+	return bulletRef
+end
+
+local function bloodParticle(color, hit)
+	local bloodAmount = math.random(2,8)
+	for i = 0, bloodAmount, 1 do
+		local BloodSplatter = game.ReplicatedStorage.GameAssets.Particles.Blood:Clone()
+		BloodSplatter.Color = color
+		BloodSplatter.Parent = workspace.Map.TargetFilter
+		BloodSplatter.Size = Vector3.new(Random.new():NextNumber(0.5,1.15),0.01, Random.new():NextNumber(0.5,1.15))
+		BloodSplatter.CFrame = hit.Parent.Torso.CFrame + Vector3.new(Random.new():NextNumber(-2,2), Random.new():NextNumber(-2,2), Random.new():NextNumber(-2,2))
+		Debris:AddItem(BloodSplatter, 300)
+	end
+end
+
+local function weldBulletHole(newray, bullet, holePart, color)
+	local hit, pos, normal = workspace:FindPartOnRayWithIgnoreList(newray, {workspace.Map.TargetFilter, bullet.bullet, bullet.character, camera})
+	local bullethole = holePart:Clone()
+	local particle = game.ReplicatedStorage.GameAssets.Particles.ImpactParticle:Clone()
+	particle.Parent = bullethole
+	particle.Color = ColorSequence.new(color)
+	particle.LightEmission = 0.35
+	bullethole.Parent = workspace.Map.TargetFilter
+	bullethole.CFrame = CFrame.new(pos, pos + normal) -->>: Bullet hole CFrame orientation
+
+	local Weld = Instance.new("Weld")
+	Weld.Part0 = hit
+	Weld.Part1 = bullethole
+	Weld.C0 = hit.CFrame:inverse()
+	Weld.C1 = bullethole.CFrame:inverse()
+	Weld.Parent = bullethole
+
+	Debris:AddItem(bullethole, 10)
+	
+	local SoundEffect = game.ReplicatedStorage.GameAssets.Sounds["Concrete"..math.random(1,4)]:Clone()
+	SoundEffect.Parent = bullethole
+	SoundEffect:Play()
+	particle:Emit(3)
+	
+end
+
+function ProjectileRenderController:KnitInit() -->>: Creates bullet hole instance references
+	bulletHolePart = createBulletRef(bulletHolePart, 4784881970, "BulletHole", Vector3.new(1, 1, 0.01))
+	zombieHolePart = createBulletRef(zombieHolePart, 0, "ZombieHole", Vector3.new(0.5, 0.5, 0.01))
+end
+
+function ProjectileRenderController:KnitStart()
+	local ProjectileService = Knit.GetService("ProjectileService")
+	
+	ProjectileService.RenderSignal:Connect(function(plr, HRP, torso, gunType)
+		local ProjCreated = ProjectileObject.new(plr, HRP, torso, gunType) -->>: Creates client-side projectile object
+		ProjCreated:SetProperties() -->>: Set object properties
+	end)
+
+	ProjectileService.BloodSignal:Connect(function(char, hit, color)
+		bloodParticle(color, hit)
+	end)
+
+end
+
+local function updateBullets(s)
+	for i,v in pairs(destroy) do
+		v.Parent = nil
+	end
+	destroy = {}
+	local remove = {}
+	for i,bullet in pairs(ProjectileObject.getProjTable()) do
+		
+		bullet.laps += 1 -->>: Laps increase by 1 each update
+		bullet.position = bullet.position * CFrame.new(0, 0, -bullet.velocity*s) + Vector3.new(0, -bullet.drop*s*bullet.laps, 0) -->>: Bullet physic calculations
+		
+		local bul = bullet.bullet
+		local distance = (bullet.oldposition.p - bullet.position.p).magnitude
+		bul.CFrame = CFrame.new(bullet.oldposition.p, bullet.position.p) * CFrame.new(0,0, -distance*0.5) -->>: Updates bullet CFrame based on previous position
+		
+		local newray = Ray.new(bul.Position, bul.CFrame.LookVector * 3) -->>: Creates a ray in front of projectile to check for collisions
+		local hit = workspace:FindPartOnRayWithIgnoreList(newray, {workspace.Map.TargetFilter, 
+			workspace.Map.DestructFilter, bullet.bullet, bullet.character, camera})
+		local Part,Position,Normal = game.Workspace:FindPartOnRay(newray, bullet.Character, false,true)
+		
+		if hit and bullet.hit == false then			
+
+			bullet.hit = true
+			table.insert(destroy, bullet.bullet) -->>: Tag bullet for destruction
+			table.insert(remove, i) -->>: Tag bullet for removal
+
+			if CollectionService:HasTag(hit.Parent, "Zombie") or CollectionService:HasTag(hit, "ZombieDead") then -->>: Checks collision tags
+				
+				if game.Players.LocalPlayer.Character == bullet.character then
+					local BulletWrap = coroutine.wrap(function() -->>: Creates a thread so does not delay the render loop
+						Knit.GetService("BulletService"):DamageReplication(hit, bullet.damage, bullet.pierce)
+					end)()
+				end	
+				
+				weldBulletHole(newray, bullet, zombieHolePart, Color3.fromRGB(255, 85, 85)) -->>: If is a zombie, then returns zombie hole
+				
+			elseif CollectionService:HasTag(hit, "Obstacle") then -->>: If is tagged as an obstacle, then returns bullet hole
+				weldBulletHole(newray, bullet, bulletHolePart, hit.Color)
+			end
+
+		else
+			
+			bullet.oldposition = bullet.position
+			
+			if tick() > bullet.despawn then
+				table.insert(destroy, bullet.bullet) -->>: Tag bullet for destruction
+				table.insert(remove, i) -->>: Tag bullet for removal
+			end
+			
+		end
+	end
+	for i, iteration in pairs(remove) do --remove tagged bullets
+		table.remove(ProjectileObject.getProjTable(), iteration-i+1) -->: Removes projectile from table
+	end
+end
+
+game:GetService("RunService").RenderStepped:Connect(function(s)
+	updateBullets(s)
+end)
+
+return ProjectileRenderController

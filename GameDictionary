@@ -4,7 +4,7 @@ local DefaultDamage = 5
 return {
 
 	["Primary"] = {
-		["Glock"]   = {Damage = 55,  Velocity = 135, Drop = 0.75, ShootDelay = 0.25,  Elevation = 0.75, Pierce = false, Range = -0.5, Ammo = 100, ReloadTime = 0.5, 
+		["Glock"]   = {Damage = 50,  Velocity = 135, Drop = 0.75, ShootDelay = 0.25,  Elevation = 0.75, Pierce = false, Range = -0.5, Ammo = 100, ReloadTime = 0.5, 
 			Cartridge = 15, Idle = "GunStance",     Shoot = "GunShot", Image = "9102511153"},
 
 		["Rifle"]   = {Damage = 350, Velocity = 150, Drop = 0.25,  ShootDelay = 0.3,  Elevation = 1, Pierce = true,  Range = -6,   Ammo = 50,   ReloadTime = 1,

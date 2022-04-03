@@ -105,7 +105,7 @@ local function updateBullets(s)
 		local distance = (bullet.oldposition.p - bullet.position.p).magnitude
 		bul.CFrame = CFrame.new(bullet.oldposition.p, bullet.position.p) * CFrame.new(0,0, -distance*0.5) -->>: Updates bullet CFrame based on previous position
 		
-		local newray = Ray.new(bul.Position, bul.CFrame.LookVector * 3) -->>: Creates a ray in front of projectile to check for collisions
+		local newray = Ray.new(bullet.oldposition.p, (bullet.position.p - bullet.oldposition.p).unit * distance)
 		local hit = workspace:FindPartOnRayWithIgnoreList(newray, {workspace.Map.TargetFilter, 
 			workspace.Map.DestructFilter, bullet.bullet, bullet.character, camera})
 		local Part,Position,Normal = game.Workspace:FindPartOnRay(newray, bullet.Character, false,true)
